@@ -1,7 +1,5 @@
-import cv2
 import tensorflow as tf
 import json
-import numpy as np
 from matplotlib import pyplot as plt
 
 
@@ -37,25 +35,6 @@ train = train.prefetch(4)
 
 print("Train dataset created.")
 
-test_images = tf.data.Dataset.list_files('aug_data\\test\\images\\*.jpg', shuffle=False)
-test_images = test_images.map(load_image)
-test_images = test_images.map(lambda x: tf.image.resize(x, (120, 120)))
-test_images = test_images.map(lambda x: x / 255)
-
-print("Test images loaded.")
-
-test_labels = tf.data.Dataset.list_files('aug_data\\test\\labels\\*.json', shuffle=False)
-test_labels = test_labels.map(lambda x: tf.py_function(load_labels, [x], [tf.uint8, tf.float16]))
-
-print("Test image labels loaded.")
-
-test = tf.data.Dataset.zip((test_images, test_labels))
-test = test.shuffle(1300)
-test = test.batch(8)
-test = test.prefetch(4)
-
-print("Test dataset created.")
-
 val_images = tf.data.Dataset.list_files('aug_data\\val\\images\\*.jpg', shuffle=False)
 val_images = val_images.map(load_image)
 val_images = val_images.map(lambda x: tf.image.resize(x, (120, 120)))
@@ -74,20 +53,6 @@ val = val.batch(8)
 val = val.prefetch(4)
 
 print("Val dataset created.")
-
-# data_samples = train.as_numpy_iterator()
-# res = data_samples.next()
-# fig, ax = plt.subplots(ncols=4, figsize=(20, 20))
-# for idx in range(4):
-#     sample_image = res[0][idx]
-#     sample_coords = res[1][1][idx]
-#
-#     cv2.rectangle(sample_image,
-#                   tuple(np.multiply(sample_coords[:2], [120, 120]).astype(int)),
-#                   tuple(np.multiply(sample_coords[2:], [120, 120]).astype(int)),
-#                   (255, 0, 0), 2)
-#
-#     ax[idx].imshow(sample_image)
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, Dense, GlobalMaxPooling2D
@@ -214,7 +179,7 @@ tensorboard_callback = TensorBoard(log_dir=logdir)
 
 hist = model.fit(train, epochs=10, validation_data=val, callbacks=[tensorboard_callback])
 
-model.save('face_tracker.keras')
+facetracker.save('face_tracker.keras')
 
 print(hist.history)
 
