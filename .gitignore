@@ -154,3 +154,5 @@ cython_debug/
 data/
 aug_data/
 data - Copy/
+logs/
+*.keras
